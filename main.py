@@ -7,23 +7,24 @@ from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    result = tasks.add.delay(2,2)
-    result1 = {
-        "task_id": result.id,
-        "task_status": result.status,
-        "task_result": result.result
-    }
-    time.sleep(5)
-    result = {
-        "task_id": result.id,
-        "task_status": result.status,
-        "task_result": result.result
-    }
-
+@app.get("/test")
+def test():
     return JSONResponse({
-        "result1":result1,
-        "result":result
+        "PING":"PONG"
     })
 
+@app.get("/create_task")
+def create_task():
+    result = tasks.add.delay(2,2)
+
+    return JSONResponse({
+        "result":result.id
+    })
+
+@app.get("/get_status/{task_id}")
+def get_status(task_id):
+    result = AsyncResult(task_id)
+    print(result.status)
+    return JSONResponse({
+        "status":result.status
+    })
